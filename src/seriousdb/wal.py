@@ -30,14 +30,24 @@ class WalEntry:
 
         Raises
         ------
+        TypeError
+            If `data` is not a dictionary.
         ValueError
-            If `data` does not describe a know entry type.
+            If `data` does not describe a known entry type.
         """
+        if not isinstance(data, dict):
+            raise TypeError
+
         op = data.get("op")
-        if op == "set":
-            return SetEntry(key=data["key"], value=data["value"])
-        if op == "delete":
-            return DeleteEntry(key=data["key"])
+        try:
+            if op == "set":
+                return SetEntry(key=data["key"], value=data["value"])
+
+            if op == "delete":
+                return DeleteEntry(key=data["key"])
+        except KeyError as e:
+            raise ValueError from e
+
         raise ValueError
 
 
@@ -147,7 +157,12 @@ class WriteAheadLog:
                 if line:
                     try:
                         entries.append(WalEntry.from_dict(json.loads(line.decode())))
-                    except (json.JSONDecodeError, UnicodeDecodeError, ValueError) as e:
+                    except (
+                        json.JSONDecodeError,
+                        UnicodeDecodeError,
+                        TypeError,
+                        ValueError,
+                    ) as e:
                         logger.warning(
                             "Corrupt entry in write-ahead log %s (%s)",
                             self.filename,
