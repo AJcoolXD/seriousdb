@@ -36,7 +36,7 @@ class WalEntry:
             If `data` does not describe a known entry type.
         """
         if not isinstance(data, dict):
-            raise TypeError
+            raise TypeError("entry must be a dictionary")
 
         op = data.get("op")
         try:
@@ -46,9 +46,9 @@ class WalEntry:
             if op == "delete":
                 return DeleteEntry(key=data["key"])
         except KeyError as e:
-            raise ValueError from e
+            raise ValueError(f"missing required field: {e}") from e
 
-        raise ValueError
+        raise ValueError(f"unknown operation: {op!r}")
 
 
 @dataclass(frozen=True)
