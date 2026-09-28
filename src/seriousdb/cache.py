@@ -399,9 +399,8 @@ class Cache:
 
         self._writes_since_compact = 0
 
-
     def _require_db(self) -> dict[str, str]:
-        """Validate and return the loaded data of `cache`.
+        """Validate and return the loaded data.
 
         The caller must hold ``lock`` while using the returned ``dict``.
 
@@ -414,7 +413,7 @@ class Cache:
         Raises
         ------
         ServiceUnavailableError
-            If `cache` has no database loaded.
+            If no database is loaded.
         """
         if self.db is None:
             logger.error("Database unavailable: %s", self.filename)
@@ -424,9 +423,8 @@ class Cache:
 
         return self.db
 
-
     def _require_wal(self) -> WriteAheadLog:
-        """Validate and return the write-ahead log of `cache`.
+        """Validate and return the write-ahead log.
 
         The caller must hold ``lock`` while using the returned log.
 
@@ -438,7 +436,7 @@ class Cache:
         Raises
         ------
         ServiceUnavailableError
-            If `cache` has no database loaded.
+            If no database is loaded.
         """
         if self.wal is None:
             logger.error("Write-ahead log unavailable: %s", self.filename)
