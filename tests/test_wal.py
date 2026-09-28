@@ -64,6 +64,34 @@ def test_replay_drops_and_truncates_a_torn_last_entry(wal, wal_path):
     )
 
 
+@pytest.mark.parametrize(
+    "malformed",
+    [
+        b'{"op": "set", "key": "b"}\n',  # Missing required field
+        b"[]\n",  # Unexpected top-level type
+    ],
+)
+def test_replay_recovers_from_malformed_entry(wal, wal_path, malformed):
+    wal.append(SetEntry(key="a", value="1"))
+
+    with open(wal_path, "ab") as f:
+        f.write(malformed)
+
+    assert wal.replay() == [SetEntry(key="a", value="1")]
+
+    with open(wal_path, "rb") as f:
+        assert f.read() == (
+            json.dumps(SetEntry(key="a", value="1").to_dict()).encode() + b"\n"
+        )
+
+    wal.append(SetEntry(key="c", value="3"))
+
+    assert wal.replay() == [
+        SetEntry(key="a", value="1"),
+        SetEntry(key="c", value="3"),
+    ]
+
+
 def test_append_after_repaired_truncation_stays_valid(wal, wal_path):
     wal.append(SetEntry(key="a", value="1"))
     wal.append(SetEntry(key="b", value="2"))
