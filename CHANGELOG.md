@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Removed
 
 - `VERSION` file; the README version badge now reads the version from PyPI ([#301](https://github.com/danieldeer/seriousdb/pull/301)).
+- Nix development environment (`flake.nix`, `flake.lock`) and related documentation; `uv` is the only supported setup now.
 
 ## [0.2.2] - 2026-09-25
 
